@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/views/payment/payment_screen.dart';
 import 'package:flutter/material.dart';
 
 class CartScreen extends StatefulWidget {
@@ -205,7 +206,9 @@ class _CartScreenState extends State<CartScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>PaymentScreen()));
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF7B3FF2),
                       shape: RoundedRectangleBorder(

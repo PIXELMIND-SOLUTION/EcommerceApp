@@ -1,3 +1,11 @@
+import 'package:ecommerce_app/views/Reviews/review_screen.dart';
+import 'package:ecommerce_app/views/address/address_screen.dart';
+import 'package:ecommerce_app/views/home/wishlist_screen.dart';
+import 'package:ecommerce_app/views/notifications/notification_screen.dart';
+import 'package:ecommerce_app/views/orders/order_detail_screen.dart';
+import 'package:ecommerce_app/views/policies/help_screen.dart';
+import 'package:ecommerce_app/views/policies/privacy_policy.dart';
+import 'package:ecommerce_app/views/policies/terms_conditions.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -75,21 +83,59 @@ class ProfileScreen extends StatelessWidget {
 
             // Profile Options
             buildSectionTitle("Account"),
-            buildMenuTile(Icons.shopping_bag, "My Orders"),
-            buildMenuTile(Icons.favorite, "Wishlist"),
-            buildMenuTile(Icons.location_on, "My Addresses"),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => OrderDetailScreen()),
+                );
+              },
+
+              child: buildMenuTile(Icons.shopping_bag, "My Orders"),
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>WishlistScreen()));
+              },
+              child: buildMenuTile(Icons.favorite, "Wishlist")),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>AddressScreen()));
+              },
+              child: buildMenuTile(Icons.location_on, "My Addresses")),
             buildMenuTile(Icons.credit_card, "Payment Methods"),
             buildMenuTile(Icons.local_offer, "Coupons"),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>ReviewScreen()));
+              },
+              child: buildMenuTile(Icons.star, "Reviews")),
 
             const SizedBox(height: 10),
 
             buildSectionTitle("Settings"),
-            buildMenuTile(Icons.notifications, "Notifications"),
-            buildMenuTile(Icons.language, "Language"),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>NotificationScreen()));
+              },
+              child: buildMenuTile(Icons.notifications, "Notifications")),
+            // buildMenuTile(Icons.language, "Language"),
             // buildMenuTile(Icons.brightness_6, "Theme Mode"),
-            buildMenuTile(Icons.privacy_tip, "Privacy Policy"),
-            buildMenuTile(Icons.description, "Terms & Conditions"),
-            buildMenuTile(Icons.help_center, "Help & Support"),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>PrivacyPolicy()));
+              },
+              child: buildMenuTile(Icons.privacy_tip, "Privacy Policy")),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>TermsConditions()));
+              },
+            child: buildMenuTile(Icons.description, "Terms & Conditions")),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>HelpScreen()));
+              },
+              child: buildMenuTile(Icons.help_center, "Help & Support")),
 
             const SizedBox(height: 20),
 
@@ -150,7 +196,7 @@ class ProfileScreen extends StatelessWidget {
         leading: Icon(icon, color: Colors.deepPurple),
         title: Text(title),
         trailing: const Icon(Icons.arrow_forward_ios, size: 18),
-        onTap: () {},
+        // onTap: () {},
       ),
     );
   }
