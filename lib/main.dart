@@ -1,5 +1,11 @@
+import 'package:ecommerce_app/providers/auth/forgot_password_provider.dart';
+import 'package:ecommerce_app/providers/auth/login_provider.dart';
+import 'package:ecommerce_app/providers/auth/profile_provider.dart';
+import 'package:ecommerce_app/providers/auth/signup_provider.dart';
+import 'package:ecommerce_app/providers/location/location_provider.dart';
 import 'package:ecommerce_app/views/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -8,16 +14,24 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'E commerce App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => LoginProvider()),
+        ChangeNotifierProvider(create: (_) => ForgotPasswordProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
+        ChangeNotifierProvider(create: (_) => LocationProvider()),
+      ],
+      child: MaterialApp(
+        title: 'E commerce App',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        ),
+        debugShowCheckedModeBanner: false,
+        home: const SplashScreen(),
       ),
-      debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
     );
   }
 }

@@ -1,6 +1,16 @@
+import 'package:ecommerce_app/helper/storage_helper.dart';
+import 'package:ecommerce_app/models/category_model.dart';
+import 'package:ecommerce_app/providers/auth/profile_provider.dart';
+import 'package:ecommerce_app/services/category/category_service.dart';
+import 'package:ecommerce_app/views/address/address_screen.dart';
+import 'package:ecommerce_app/views/category/category_screen.dart';
 import 'package:ecommerce_app/views/detail/product_detail_screen.dart';
+import 'package:ecommerce_app/views/location/location_screen.dart';
+import 'package:ecommerce_app/views/notifications/notification_screen.dart';
+import 'package:ecommerce_app/widgets/carousel_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:provider/provider.dart';
+// import 'package:carousel_slider/carousel_slider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -12,6 +22,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentCarouselIndex = 0;
   String _selectedFlashSaleCategory = 'Newest';
+  String? userId;
+
+  List<CategoryModel> _categoriess = [];
+  bool _isCategoryLoading = true;
+
+  String? selectedLocation;
 
   final List<Map<String, dynamic>> _offers = [
     {
@@ -34,45 +50,28 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
-  // final List<Map<String, dynamic>> _categories = [
-  //   {'name': 'Clothes', 'icon': Icons.checkroom, 'color': Colors.red.shade100},
+  //   final List<Map<String, dynamic>> _categories = [
+  //   {
+  //     'name': 'Clothes',
+  //     'image': 'https://www.beyours.in/cdn/shop/files/black-classic-shirt.jpg?v=1744815740',
+  //     'color': Colors.red.shade100,
+  //   },
   //   {
   //     'name': 'Electronics',
-  //     'icon': Icons.devices,
+  //     'image': 'https://images-cdn.ubuy.co.in/67c16783dcab667e6d1ef1a8-samsung-32-class-fhd-1080p-smart-led.jpg',
   //     'color': Colors.orange.shade100,
   //   },
   //   {
   //     'name': 'Shoes',
-  //     'icon': Icons.directions_run,
+  //     'image': 'https://m.media-amazon.com/images/I/71f3BmjCwtL.jpg',
   //     'color': Colors.pink.shade100,
   //   },
-  //   {'name': 'Watch', 'icon': Icons.watch, 'color': Colors.red.shade100},
+  //   {
+  //     'name': 'Watch',
+  //     'image': 'https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwb830e1d4/images/Titan/Catalog/1805QM04_1.jpg?sw=600&sh=600',
+  //     'color': Colors.red.shade100,
+  //   },
   // ];
-
-
-  final List<Map<String, dynamic>> _categories = [
-  {
-    'name': 'Clothes',
-    'image': 'https://www.beyours.in/cdn/shop/files/black-classic-shirt.jpg?v=1744815740',
-    'color': Colors.red.shade100,
-  },
-  {
-    'name': 'Electronics',
-    'image': 'https://images-cdn.ubuy.co.in/67c16783dcab667e6d1ef1a8-samsung-32-class-fhd-1080p-smart-led.jpg',
-    'color': Colors.orange.shade100,
-  },
-  {
-    'name': 'Shoes',
-    'image': 'https://m.media-amazon.com/images/I/71f3BmjCwtL.jpg',
-    'color': Colors.pink.shade100,
-  },
-  {
-    'name': 'Watch',
-    'image': 'https://www.titan.co.in/dw/image/v2/BKDD_PRD/on/demandware.static/-/Sites-titan-master-catalog/default/dwb830e1d4/images/Titan/Catalog/1805QM04_1.jpg?sw=600&sh=600',
-    'color': Colors.red.shade100,
-  },
-];
-
 
   final List<Map<String, dynamic>> _allProducts = [
     {
@@ -184,6 +183,41 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<ProfileProvider>(context, listen: false);
+      provider.loadUserFromPreferences();
+    });
+    _loadCategories();
+    _loadSavedLocation();
+  }
+
+  void _loadSavedLocation() async {
+    final savedLocation = await SharedPreferencesHelper.getLocation();
+    if (mounted) {
+      setState(() {
+        selectedLocation = savedLocation;
+      });
+    }
+  }
+
+  void _loadCategories() async {
+    try {
+      final categories = await CategoryService().fetchCategories();
+      setState(() {
+        _categoriess = categories;
+        _isCategoryLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isCategoryLoading = false;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
@@ -215,116 +249,250 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
-
-Widget _buildHeader() {
-  return Container(
-    decoration: BoxDecoration(
-      gradient: LinearGradient(
-        colors: [
-          const Color(0xFF7B3FF2),
-          const Color(0xFF2D1B69),
-        ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
+  Widget _buildHeader() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [const Color(0xFF7B3FF2), const Color(0xFF2D1B69)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
       ),
-      borderRadius: const BorderRadius.only(
-        bottomLeft: Radius.circular(24),
-        bottomRight: Radius.circular(24),
-      ),
-    ),
-    padding: const EdgeInsets.all(16),
-    child: Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Location',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
-                    fontSize: 12,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
-                  children: const [
-                    Icon(Icons.location_on, color: Colors.white, size: 16),
-                    SizedBox(width: 4),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Column(
+              //   crossAxisAlignment: CrossAxisAlignment.start,
+              //   children: [
+              //     Text(
+              //       'Location',
+              //       style: TextStyle(
+              //         color: Colors.white.withOpacity(0.8),
+              //         fontSize: 12,
+              //       ),
+              //     ),
+              //     const SizedBox(height: 4),
+              //     Row(
+              //       children: [
+              //         Icon(Icons.location_on, color: Colors.white, size: 16),
+              //         SizedBox(width: 4),
+              //         GestureDetector(
+              //           onTap: () async {
+              //             final user = await SharedPreferencesHelper.getUser();
+
+              //             final result = await Navigator.push(
+              //               context,
+              //               MaterialPageRoute(
+              //                 builder: (context) =>
+              //                     LocationScreen(userId: user?.id),
+              //               ),
+              //             );
+
+              //             if (result != null) {
+              //               setState(() {
+              //                 selectedLocation = result['address'];
+              //               });
+              //             }
+              //           },
+              //           child: Text(
+              //             selectedLocation ?? 'Choose Location',
+              //             style: const TextStyle(
+              //               color: Colors.white,
+              //               fontSize: 14,
+              //               fontWeight: FontWeight.w600,
+              //             ),
+              //           ),
+              //         ),
+
+              //         Icon(
+              //           Icons.keyboard_arrow_down,
+              //           color: Colors.white,
+              //           size: 20,
+              //         ),
+              //       ],
+              //     ),
+              //   ],
+              // ),
+              // Flexible(
+              //   child: GestureDetector(
+              //     onTap: () async {
+              //       final user = await SharedPreferencesHelper.getUser();
+
+              //       final result = await Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (context) => LocationScreen(userId: user?.id),
+              //         ),
+              //       );
+
+              //       if (result != null) {
+              //         setState(() {
+              //           selectedLocation = result['address'];
+              //         });
+              //       }
+              //     },
+              //     child: Text(
+              //       selectedLocation ?? 'Choose Location',
+              //       softWrap: true,
+              //       maxLines: 2,
+              //       style: const TextStyle(
+              //         color: Colors.white,
+              //         fontSize: 14,
+              //         fontWeight: FontWeight.w600,
+              //       ),
+              //     ),
+              //   ),
+              // ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      'New York, USA',
+                      'Location',
+
                       style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        color: const Color.fromARGB(
+                          255,
+                          255,
+                          255,
+                          255,
+                        ).withOpacity(0.8),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_down,
-                        color: Colors.white, size: 20),
+                    const SizedBox(height: 4),
+
+                    GestureDetector(
+                      onTap: () async {
+                        final user = await SharedPreferencesHelper.getUser();
+
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                LocationScreen(userId: user?.id),
+                          ),
+                        );
+
+                        // if (result != null) {
+                        //   setState(() {
+                        //     selectedLocation = result['address'];
+                        //   });
+                        // }
+
+                        if (result != null) {
+                          setState(() {
+                            selectedLocation = result['address'];
+                          });
+
+                          SharedPreferencesHelper.saveLocation(
+                            result['address'],
+                          );
+                        }
+                      },
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.location_on,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                          const SizedBox(width: 4),
+
+                          Expanded(
+                            child: Text(
+                              selectedLocation ?? 'Choose Location',
+                              softWrap: true,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+
+                          Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ],
-            ),
-            CircleAvatar(
-              backgroundColor: Colors.white.withOpacity(0.2),
-              child: const Icon(
-                Icons.notifications_outlined,
-                color: Colors.white,
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              const Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    border: InputBorder.none,
-                    prefixIcon: Icon(Icons.search, color: Colors.grey),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NotificationScreen(),
+                    ),
+                  );
+                },
+                child: CircleAvatar(
+                  backgroundColor: Colors.white.withOpacity(0.2),
+                  child: const Icon(
+                    Icons.notifications_outlined,
+                    color: Colors.white,
                   ),
                 ),
-              ),
-              Container(
-                margin: const EdgeInsets.all(4),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [
-                      Color(0xFF7B3FF2),
-                      Color(0xFF2D1B69),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(Icons.tune, color: Colors.white, size: 20),
               ),
             ],
           ),
-        ),
-      ],
-    ),
-  );
-}
-
-
-
-
-
-
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      hintText: 'Search',
+                      border: InputBorder.none,
+                      prefixIcon: Icon(Icons.search, color: Colors.grey),
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(4),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF7B3FF2), Color(0xFF2D1B69)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.tune, color: Colors.white, size: 20),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildSpecialOffersSection() {
     return Column(
@@ -338,170 +506,14 @@ Widget _buildHeader() {
                 '#SpecialForYou',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              TextButton(onPressed: () {}, child: const Text('See All')),
+              // TextButton(onPressed: () {}, child: const Text('See All')),
             ],
           ),
         ),
         const SizedBox(height: 12),
-        CarouselSlider(
-          options: CarouselOptions(
-            height: 180,
-            autoPlay: true,
-            enlargeCenterPage: true,
-            viewportFraction: 0.85,
-            onPageChanged: (index, reason) {
-              setState(() {
-                _currentCarouselIndex = index;
-              });
-            },
-          ),
-          items: _offers.map((offer) {
-            return Builder(
-              builder: (BuildContext context) {
-                return Container(
-                  width: MediaQuery.of(context).size.width,
-                  margin: const EdgeInsets.symmetric(horizontal: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  clipBehavior: Clip.hardEdge,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Image.network(offer['image'], fit: BoxFit.cover),
-                      Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.black.withOpacity(0.7),
-                              Colors.transparent,
-                            ],
-                            begin: Alignment.bottomLeft,
-                            end: Alignment.topRight,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.5),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: const Text(
-                                  'Limited time!',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            FittedBox(
-                              fit: BoxFit.scaleDown,
-                              alignment: Alignment.centerLeft,
-                              child: Text(
-                                offer['title'],
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text(
-                                  'Up to',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  offer['discount'],
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                    height: 1,
-                                  ),
-                                ),
-                                const Text(
-                                  '%',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            // ElevatedButton(
-                            //   onPressed: () {},
-                            //   style: ElevatedButton.styleFrom(
-                            //     backgroundColor: Colors.red.shade500,
-                            //     foregroundColor: Colors.white,
-                            //     shape: RoundedRectangleBorder(
-                            //       borderRadius: BorderRadius.circular(20),
-                            //     ),
-                            //     padding: const EdgeInsets.symmetric(
-                            //       horizontal: 20,
-                            //       vertical: 6,
-                            //     ),
-                            //     minimumSize: const Size(0, 32),
-                            //   ),
-                            //   child: const Text(
-                            //     'Claim',
-                            //     style: TextStyle(
-                            //       fontWeight: FontWeight.bold,
-                            //       fontSize: 13,
-                            //     ),
-                            //   ),
-                            // ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            );
-          }).toList(),
-        ),
+        CarouselWidget(),
+
         const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: _offers.asMap().entries.map((entry) {
-            return Container(
-              width: _currentCarouselIndex == entry.key ? 24 : 8,
-              height: 8,
-              margin: const EdgeInsets.symmetric(horizontal: 4),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(4),
-                color: _currentCarouselIndex == entry.key
-                    ? Color(0xFF5B2C91).withOpacity(0.8)
-                    : Colors.grey.shade300,
-              ),
-            );
-          }).toList(),
-        ),
       ],
     );
   }
@@ -518,53 +530,64 @@ Widget _buildHeader() {
                 'Category',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              TextButton(onPressed: () {}, child: const Text('See All')),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CategoryScreen()),
+                  );
+                },
+                child: const Text('See All'),
+              ),
             ],
           ),
         ),
         const SizedBox(height: 12),
-        SizedBox(
-          height: 100,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            itemCount: _categories.length,
-            itemBuilder: (context, index) {
-              final category = _categories[index];
-              return Container(
-                width: 80,
-                margin: const EdgeInsets.symmetric(horizontal: 4),
-                child: Column(
-                  children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      // decoration: BoxDecoration(
-                      //   color: category['color'],
-                      //   borderRadius: BorderRadius.circular(16),
-                      // ),
-                      child: Image.network(category['image']),
-                      // child: Icon(
-                      //   category['icon'],
-                      //   color: Colors.red.shade700,
-                      //   size: 32,
-                      // ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      category['name'],
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+
+        _isCategoryLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SizedBox(
+                height: 100,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemCount: _categoriess.length,
+                  itemBuilder: (context, index) {
+                    final category = _categoriess[index];
+
+                    return Container(
+                      width: 80,
+                      margin: const EdgeInsets.symmetric(horizontal: 4),
+                      child: Column(
+                        children: [
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16),
+                              color: Colors.grey.shade200,
+                            ),
+                            clipBehavior: Clip.hardEdge,
+                            child: Image.network(
+                              category.image,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            category.name,
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                    );
+                  },
                 ),
-              );
-            },
-          ),
-        ),
+              ),
       ],
     );
   }
@@ -581,7 +604,6 @@ Widget _buildHeader() {
                 'Flash Sale',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-        
             ],
           ),
         ),
@@ -633,7 +655,9 @@ Widget _buildHeader() {
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         side: BorderSide(
-          color: isSelected ? const Color.fromARGB(255, 254, 254, 254) : Colors.grey.shade300,
+          color: isSelected
+              ? const Color.fromARGB(255, 254, 254, 254)
+              : Colors.grey.shade300,
         ),
       ),
     );
@@ -658,9 +682,13 @@ Widget _buildHeader() {
           final product = products[index];
           return GestureDetector(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>ProductDetailScreen()));
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProductDetailScreen()),
+              );
             },
-            child: _buildProductCard(product));
+            child: _buildProductCard(product),
+          );
         },
       ),
     );

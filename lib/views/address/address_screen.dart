@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/views/address/add_address_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:animate_do/animate_do.dart';
 
@@ -147,27 +148,27 @@ class _AddressScreenState extends State<AddressScreen> {
                                 color: Colors.black87,
                               ),
                             ),
-                            if (address.isDefault) ...[
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: const Text(
-                                  'Default',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
+                            // if (address.isDefault) ...[
+                            //   const SizedBox(width: 8),
+                            //   Container(
+                            //     padding: const EdgeInsets.symmetric(
+                            //       horizontal: 8,
+                            //       vertical: 2,
+                            //     ),
+                            //     decoration: BoxDecoration(
+                            //       color: Colors.green,
+                            //       borderRadius: BorderRadius.circular(4),
+                            //     ),
+                            //     child: const Text(
+                            //       'Default',
+                            //       style: TextStyle(
+                            //         color: Colors.white,
+                            //         fontSize: 10,
+                            //         fontWeight: FontWeight.w600,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ],
                           ],
                         ),
                         const SizedBox(height: 2),
@@ -343,6 +344,8 @@ class _AddressScreenState extends State<AddressScreen> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () {
+
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>AddAddressScreen()));
                       // Add new address
                     },
                     icon: const Icon(Icons.add),

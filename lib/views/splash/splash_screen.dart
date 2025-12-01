@@ -236,19 +236,9 @@
 //   }
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-import 'package:ecommerce_app/views/auth/login_screen.dart';
+import 'package:ecommerce_app/helper/storage_helper.dart';
 import 'package:ecommerce_app/views/auth/onboarding_screen.dart';
+import 'package:ecommerce_app/views/navbar/navbar_screen.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -320,16 +310,34 @@ class _SplashScreenState extends State<SplashScreen>
       _textController.forward();
     });
 
-    // Navigate to next screen after delay
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () async {
       if (mounted) {
+        final bool loggedIn = await SharedPreferencesHelper.isLoggedIn();
+
+        if (!mounted) return;
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+          MaterialPageRoute(
+            builder: (_) => loggedIn
+                ? const MainNavigationScreen()
+                : const OnboardingScreen(),
+          ),
         );
       }
     });
   }
+
+  // Navigate to next screen after delay
+  //   Future.delayed(const Duration(seconds: 3), () {
+  //     if (mounted) {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (_) => const OnboardingScreen()),
+  //       );
+  //     }
+  //   });
+  // }
 
   @override
   void dispose() {
@@ -430,7 +438,8 @@ class _SplashScreenState extends State<SplashScreen>
                                 animation: _shimmerController,
                                 builder: (context, child) {
                                   return Transform.scale(
-                                    scale: 1.0 + (_shimmerController.value * 0.3),
+                                    scale:
+                                        1.0 + (_shimmerController.value * 0.3),
                                     child: Opacity(
                                       opacity: 1.0 - _shimmerController.value,
                                       child: const Icon(
@@ -467,7 +476,9 @@ class _SplashScreenState extends State<SplashScreen>
                               letterSpacing: 1.5,
                               shadows: [
                                 Shadow(
-                                  color: const Color(0xFF7B3FF2).withOpacity(0.5),
+                                  color: const Color(
+                                    0xFF7B3FF2,
+                                  ).withOpacity(0.5),
                                   offset: const Offset(0, 4),
                                   blurRadius: 8,
                                 ),
