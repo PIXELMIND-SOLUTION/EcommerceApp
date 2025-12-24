@@ -38,15 +38,13 @@ class ApiConstants {
 
   static String getImageUrl(String? imagePath) {
     if (imagePath == null || imagePath.isEmpty) {
-      return 'https://i.pravatar.cc/150?img=3'; // Default avatar
+      return 'https://i.pravatar.cc/150?img=3';
     }
 
-    // If already a complete URL, return as is
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
 
-    // Otherwise, prepend base URL
     return '$baseUrl/$imagePath';
   }
 

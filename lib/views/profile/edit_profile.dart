@@ -1,141 +1,3 @@
-// // import 'package:flutter/material.dart';
-
-// // class EditProfile extends StatelessWidget {
-// //   const EditProfile({super.key});
-
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       backgroundColor: Colors.white,
-// //       appBar: AppBar(
-// //         elevation: 0,
-// //         backgroundColor: Colors.white,
-// //         leading: IconButton(
-// //           icon: const Icon(Icons.arrow_back, color: Colors.black),
-// //           onPressed: () => Navigator.pop(context),
-// //         ),
-// //       ),
-// //       body: SingleChildScrollView(
-// //         padding: const EdgeInsets.symmetric(horizontal: 24),
-// //         child: Column(
-// //           children: [
-// //             const SizedBox(height: 10),
-
-// //             /// ---- Title ----
-// //             const Align(
-// //               alignment: Alignment.topCenter,
-// //               child: Text(
-// //                 "Edit Profile",
-// //                 style: TextStyle(
-// //                   fontSize: 28,
-// //                   fontWeight: FontWeight.bold,
-// //                   color: Colors.black,
-// //                 ),
-// //               ),
-// //             ),
-
-// //             const SizedBox(height: 30),
-
-// //             Center(
-// //               child: Stack(
-// //                 alignment: Alignment.center,
-// //                 children: [
-// //                   /// Profile Image
-// //                   const CircleAvatar(
-// //                     radius: 60,
-// //                     backgroundImage: NetworkImage("https://i.pravatar.cc/150?img=3"),
-// //                   ),
-
-// //                   /// Camera Button
-// //                   Positioned(
-// //                     bottom: 4,
-// //                     right: 4,
-// //                     child: GestureDetector(
-// //                       onTap: () {
-// //                         print("Camera clicked");
-// //                       },
-// //                       child: Container(
-// //                         padding: const EdgeInsets.all(6),
-// //                         decoration: const BoxDecoration(
-// //                           color: Colors.teal,
-// //                           shape: BoxShape.circle,
-// //                         ),
-// //                         child: const Icon(Icons.camera_alt,
-// //                             color: Colors.white, size: 20),
-// //                       ),
-// //                     ),
-// //                   ),
-// //                 ],
-// //               ),
-// //             ),
-
-// //             const SizedBox(height: 30),
-
-// //             /// ---- DETAILS ----
-// //             buildProfileItem("Username", "Melvin"),
-// //             buildProfileItem("Email", "melvin@gmail.com"),
-// //             buildProfileItem("Phone", "+ 91 9961593179"),
-// //             buildProfileItem("Date of birth", "26/09/2002"),
-// //             buildProfileItem("Address", "123 Royal Street, New York"),
-// //           ],
-// //         ),
-// //       ),
-// //     );
-// //   }
-
-// //   /// ---- Reusable row ----
-// //   Widget buildProfileItem(String label, String value) {
-// //     return Column(
-// //       children: [
-// //         const SizedBox(height: 18),
-// //         Row(
-// //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-// //           children: [
-// //             Text(
-// //               label,
-// //               style: const TextStyle(
-// //                 fontSize: 15,
-// //                 color: Colors.grey,
-// //               ),
-// //             ),
-// //             Flexible(
-// //               child: Text(
-// //                 value,
-// //                 textAlign: TextAlign.right,
-// //                 style: const TextStyle(
-// //                   fontSize: 16,
-// //                   color: Colors.black,
-// //                 ),
-// //               ),
-// //             ),
-// //           ],
-// //         ),
-// //         const SizedBox(height: 12),
-// //         Container(
-// //           height: 1,
-// //           color: Colors.grey.shade300,
-// //         ),
-// //       ],
-// //     );
-// //   }
-// // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import 'dart:io';
 // import 'package:ecommerce_app/providers/auth/profile_provider.dart';
@@ -400,18 +262,6 @@
 //   }
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
 // import 'dart:io';
 // import 'package:ecommerce_app/constants/api_constant.dart';
 // import 'package:ecommerce_app/providers/auth/profile_provider.dart';
@@ -540,7 +390,6 @@
 //       ),
 //     );
 //   }
-
 
 //   Widget _buildProfileImage(String? profileUrl) {
 //   ImageProvider imageProvider;
@@ -692,18 +541,6 @@
 //   }
 // }
 
-
-
-
-
-
-
-
-
-
-
-
-
 import 'dart:io';
 import 'package:ecommerce_app/constants/api_constant.dart';
 import 'package:ecommerce_app/providers/auth/profile_provider.dart';
@@ -770,10 +607,7 @@ class _EditProfileState extends State<EditProfile> {
               });
               Navigator.pop(context);
             },
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: Colors.grey[600]),
-            ),
+            child: Text('Cancel', style: TextStyle(color: Colors.grey[600])),
           ),
           ElevatedButton(
             onPressed: () {
@@ -787,10 +621,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
-            child: const Text(
-              'Update',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Update', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -919,7 +750,11 @@ class _EditProfileState extends State<EditProfile> {
             ],
           ),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new, color: Color(0xFF2C3E50), size: 20),
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: Color(0xFF2C3E50),
+              size: 20,
+            ),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -1061,10 +896,7 @@ class _EditProfileState extends State<EditProfile> {
       decoration: BoxDecoration(
         color: const Color(0xFFF8F9FA),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.grey.withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
       ),
       child: Row(
         children: [
@@ -1078,11 +910,7 @@ class _EditProfileState extends State<EditProfile> {
               ),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
+            child: Icon(icon, color: Colors.white, size: 22),
           ),
           const SizedBox(width: 16),
           Expanded(

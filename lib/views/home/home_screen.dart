@@ -2,7 +2,6 @@ import 'package:ecommerce_app/helper/storage_helper.dart';
 import 'package:ecommerce_app/models/category_model.dart';
 import 'package:ecommerce_app/providers/auth/profile_provider.dart';
 import 'package:ecommerce_app/services/category/category_service.dart';
-import 'package:ecommerce_app/views/address/address_screen.dart';
 import 'package:ecommerce_app/views/category/category_screen.dart';
 import 'package:ecommerce_app/views/detail/product_detail_screen.dart';
 import 'package:ecommerce_app/views/location/location_screen.dart';
@@ -20,7 +19,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentCarouselIndex = 0;
+  // int _currentCarouselIndex = 0;
   String _selectedFlashSaleCategory = 'Newest';
   String? userId;
 
@@ -29,26 +28,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? selectedLocation;
 
-  final List<Map<String, dynamic>> _offers = [
-    {
-      'title': 'Get Special Offer',
-      'discount': '40',
-      'image':
-          'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800',
-    },
-    {
-      'title': 'Winter Collection',
-      'discount': '50',
-      'image':
-          'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800',
-    },
-    {
-      'title': 'New Arrivals',
-      'discount': '30',
-      'image':
-          'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800',
-    },
-  ];
+  // final List<Map<String, dynamic>> _offers = [
+  //   {
+  //     'title': 'Get Special Offer',
+  //     'discount': '40',
+  //     'image':
+  //         'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800',
+  //   },
+  //   {
+  //     'title': 'Winter Collection',
+  //     'discount': '50',
+  //     'image':
+  //         'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=800',
+  //   },
+  //   {
+  //     'title': 'New Arrivals',
+  //     'discount': '30',
+  //     'image':
+  //         'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800',
+  //   },
+  // ];
 
   //   final List<Map<String, dynamic>> _categories = [
   //   {
@@ -167,12 +166,10 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> get _filteredProducts {
     List<Map<String, dynamic>> products = List.from(_allProducts);
 
-    // Filter by category
     if (_selectedFlashSaleCategory == 'Clothes') {
       products = products.where((p) => p['category'] == 'Clothes').toList();
     }
 
-    // Sort based on selected filter
     if (_selectedFlashSaleCategory == 'Newest') {
       products.sort((a, b) => b['dateAdded'].compareTo(a['dateAdded']));
     } else if (_selectedFlashSaleCategory == 'Popular') {
@@ -186,10 +183,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final provider = Provider.of<ProfileProvider>(context, listen: false);
-      provider.loadUserFromPreferences();
+      await provider.loadUserFromPreferences();
+      setState(() {
+        userId = provider.user?.name;
+      });
     });
+
     _loadCategories();
     _loadSavedLocation();
   }
@@ -355,19 +356,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Location',
-
-                      style: TextStyle(
-                        color: const Color.fromARGB(
-                          255,
-                          255,
-                          255,
-                          255,
-                        ).withOpacity(0.8),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
+                      userId != null ? '✨ Hello $userId' : 'User',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
+
+                    // Text(
+                    //   'Location',
+
+                    //   style: TextStyle(
+                    //     color: const Color.fromARGB(
+                    //       255,
+                    //       255,
+                    //       255,
+                    //       255,
+                    //     ).withOpacity(0.8),
+                    //     fontSize: 13,
+                    //     fontWeight: FontWeight.w700,
+                    //   ),
+                    // ),
                     const SizedBox(height: 4),
 
                     GestureDetector(

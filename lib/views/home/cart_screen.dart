@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/views/detail/product_detail_screen.dart';
 import 'package:ecommerce_app/views/payment/payment_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -244,121 +245,126 @@ class _CartScreenState extends State<CartScreen> {
     required VoidCallback onIncrease,
     required Color color,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          // Product Image
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: color,
-              borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>ProductDetailScreen()));
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          children: [
+            // Product Image
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Image.network(image),
+                // child: Icon(
+                //   Icons.image,
+                //   size: 40,
+                //   color: Colors.grey[400],
+                // ),
+              ),
             ),
-            child: Center(
-              child: Image.network(image),
-              // child: Icon(
-              //   Icons.image,
-              //   size: 40,
-              //   color: Colors.grey[400],
-              // ),
-            ),
-          ),
-          const SizedBox(width: 12),
-          // Product Details
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
+            const SizedBox(width: 12),
+            // Product Details
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.delete_outline,
-                        color: Colors.orange[400],
-                        size: 20,
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: Colors.orange[400],
+                          size: 20,
+                        ),
+                        onPressed: () {},
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
                       ),
-                      onPressed: () {},
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      '\$${price.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black,
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '\$${price.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.remove, size: 16),
-                            onPressed: onDecrease,
-                            padding: const EdgeInsets.all(4),
-                            constraints: const BoxConstraints(
-                              minWidth: 32,
-                              minHeight: 32,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Text(
-                              quantity.toString(),
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove, size: 16),
+                              onPressed: onDecrease,
+                              padding: const EdgeInsets.all(4),
+                              constraints: const BoxConstraints(
+                                minWidth: 32,
+                                minHeight: 32,
                               ),
                             ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.add, size: 16),
-                            onPressed: onIncrease,
-                            padding: const EdgeInsets.all(4),
-                            constraints: const BoxConstraints(
-                              minWidth: 32,
-                              minHeight: 32,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              child: Text(
+                                quantity.toString(),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                            IconButton(
+                              icon: const Icon(Icons.add, size: 16),
+                              onPressed: onIncrease,
+                              padding: const EdgeInsets.all(4),
+                              constraints: const BoxConstraints(
+                                minWidth: 32,
+                                minHeight: 32,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -14,28 +14,23 @@ class LoginService {
       final response = await http.post(
         Uri.parse(ApiConstants.login),
         headers: ApiConstants.headers,
-        body: json.encode({
-          'email': email,
-          'password': password,
-        }),
+        body: json.encode({'email': email, 'password': password}),
       );
 
       final responseData = json.decode(response.body);
 
       print('response status code for login ${response.statusCode}');
-            print('response bodyyyyyyyyyyyyyy for login ${response.body}');
-
+      print('response bodyyyyyyyyyyyyyy for login ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (responseData['success'] == true) {
           // Parse user data
           final user = User.fromJson(responseData['user']);
-          
+
           // Save user data and login status
           await SharedPreferencesHelper.saveUser(user);
           await SharedPreferencesHelper.setLoggedIn(true);
-          
-          // If there's a token in the response, save it
+
           if (responseData.containsKey('token')) {
             await SharedPreferencesHelper.saveToken(responseData['token']);
           }
