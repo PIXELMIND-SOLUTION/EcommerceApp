@@ -1,22 +1,3 @@
-// class ApiConstants {
-//   static const String baseUrl = 'http://31.97.206.144:3081';
-//   static const String apiPath = '/api';
-
-//   static const String register = '$baseUrl$apiPath/users/register';
-//   static const String login = '$baseUrl$apiPath/users/login';
-//   static const String forgotpassword='$baseUrl/users/forgotpassword';
-
-//   static Map<String, String> get headers => {
-//     'Content-Type': 'application/json',
-//     'Accept': 'application/json',
-//   };
-
-//   static Map<String, String> getAuthHeaders(String token) => {
-//     'Content-Type': 'application/json',
-//     'Accept': 'application/json',
-//     'Authorization': 'Bearer $token',
-//   };
-// }
 
 class ApiConstants {
   static const String baseUrl = 'http://31.97.206.144:3081';

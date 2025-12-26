@@ -1,12 +1,16 @@
 import 'package:ecommerce_app/helper/storage_helper.dart';
 import 'package:ecommerce_app/models/category_model.dart';
+import 'package:ecommerce_app/providers/LocationProvider/location_provider.dart';
+import 'package:ecommerce_app/providers/Product/product_provider.dart';
 import 'package:ecommerce_app/providers/auth/profile_provider.dart';
 import 'package:ecommerce_app/services/category/category_service.dart';
 import 'package:ecommerce_app/views/category/category_screen.dart';
 import 'package:ecommerce_app/views/detail/product_detail_screen.dart';
-import 'package:ecommerce_app/views/location/location_screen.dart';
+import 'package:ecommerce_app/views/location/location_picker.dart';
 import 'package:ecommerce_app/views/notifications/notification_screen.dart';
 import 'package:ecommerce_app/widgets/carousel_widget.dart';
+import 'package:ecommerce_app/widgets/home_header_widget.dart';
+import 'package:ecommerce_app/widgets/product_card_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 // import 'package:carousel_slider/carousel_slider.dart';
@@ -184,6 +188,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+          context.read<ProductProvider>().loadAll();
+
       final provider = Provider.of<ProfileProvider>(context, listen: false);
       await provider.loadUserFromPreferences();
       setState(() {
@@ -191,8 +197,43 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     });
 
-    _loadCategories();
-    _loadSavedLocation();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    try {
+      // EasyLoading for overall initial load / refresh
+
+      await _handleCurrentLocation();
+
+      _loadCategories();
+      _loadSavedLocation();
+    } catch (e) {
+      debugPrint('Initialization error: $e');
+    }
+  }
+
+  Future<void> _handleCurrentLocation() async {
+    try {
+      final locationProvider = Provider.of<LocationProvider>(
+        context,
+        listen: false,
+      );
+      await locationProvider.initLocation(userId.toString());
+    } catch (e) {
+      debugPrint('Location error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Location error: ${e.toString()}'),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+      }
+    }
   }
 
   void _loadSavedLocation() async {
@@ -222,30 +263,53 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 16),
-                    _buildSpecialOffersSection(),
-                    const SizedBox(height: 24),
-                    _buildCategorySection(),
-                    const SizedBox(height: 24),
-                    _buildFlashSaleSection(),
-                    const SizedBox(height: 16),
-                    _buildProductGrid(),
-                    const SizedBox(height: 20),
-                  ],
+      body: Column(
+        children: [
+          HomeHeaderWidget(
+            onLocationTap: () async {
+              final user = await SharedPreferencesHelper.getUser();
+      
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => LocationPickerScreen(
+                    isEditing: false,
+                    userId: user?.id.toString(),
+                  ),
                 ),
+              );
+      
+              if (result != null) {
+                context.read<LocationProvider>().setAddress(
+                  result['address'],
+                );
+                SharedPreferencesHelper.saveLocation(result['address']);
+              }
+            },
+            onSearch: (value) {
+              debugPrint('Searching for: $value');
+            },
+          ),
+      
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  _buildSpecialOffersSection(),
+                  const SizedBox(height: 24),
+                  _buildCategorySection(),
+                  const SizedBox(height: 24),
+                  _buildFlashSaleSection(),
+                  const SizedBox(height: 16),
+                  _buildProductGrid(),
+                  const SizedBox(height: 20),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -387,8 +451,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         final result = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                LocationScreen(userId: user?.id),
+                            builder: (_) => LocationPickerScreen(
+                              isEditing: false,
+                              userId: user?.id.toString(),
+                            ),
                           ),
                         );
 
@@ -643,66 +709,102 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFilterChip(String label, bool isSelected) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      child: FilterChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (bool value) {
-          if (value) {
-            setState(() {
-              _selectedFlashSaleCategory = label;
-            });
-          }
-        },
-        backgroundColor: Colors.white,
-        selectedColor: Colors.deepPurple,
-        checkmarkColor: Colors.white,
-        labelStyle: TextStyle(
-          color: isSelected ? Colors.white : Colors.black,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        side: BorderSide(
-          color: isSelected
-              ? const Color.fromARGB(255, 254, 254, 254)
-              : Colors.grey.shade300,
-        ),
-      ),
-    );
-  }
+Widget _buildFilterChip(String label, bool isSelected) {
+  return Container(
+    margin: const EdgeInsets.symmetric(horizontal: 4),
+    child: FilterChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (bool value) {
+        if (!value) return;
 
-  Widget _buildProductGrid() {
-    final products = _filteredProducts;
+        setState(() {
+          _selectedFlashSaleCategory = label;
+        });
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.68,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-        ),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProductDetailScreen()),
-              );
-            },
-            child: _buildProductCard(product),
-          );
-        },
+        final provider = context.read<ProductProvider>();
+
+        if (label == 'Newest') {
+          provider.loadNewest();
+        } else if (label == 'Popular') {
+          provider.loadPopular();
+        } else {
+          provider.loadAll();
+        }
+      },
+      backgroundColor: Colors.white,
+      selectedColor: Colors.deepPurple,
+      checkmarkColor: Colors.white,
+      labelStyle: TextStyle(
+        color: isSelected ? Colors.white : Colors.black,
+        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
-    );
-  }
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+    ),
+  );
+}
+
+
+Widget _buildProductGrid() {
+  return Consumer<ProductProvider>(
+    builder: (context, provider, _) {
+      if (provider.loading) {
+        return const Padding(
+          padding: EdgeInsets.all(24),
+          child: Center(child: CircularProgressIndicator()),
+        );
+      }
+
+      if (provider.error.isNotEmpty) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Center(child: Text(provider.error)),
+        );
+      }
+
+      if (provider.products.isEmpty) {
+        return const Padding(
+          padding: EdgeInsets.all(24),
+          child: Center(child: Text('No products found')),
+        );
+      }
+
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: provider.products.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.68,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+          ),
+          itemBuilder: (context, index) {
+            final product = provider.products[index];
+
+            return ProductCardWidget(
+              product: product,
+              onTap: () {
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (_) =>
+                //         ProductDetailScreen(product: product),
+                //   ),
+                // );
+              },
+            );
+          },
+        ),
+      );
+    },
+  );
+}
+
 
   Widget _buildProductCard(Map<String, dynamic> product) {
     return Container(

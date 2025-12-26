@@ -1,8 +1,9 @@
+import 'package:ecommerce_app/providers/LocationProvider/location_provider.dart';
+import 'package:ecommerce_app/providers/Product/product_provider.dart';
 import 'package:ecommerce_app/providers/auth/forgot_password_provider.dart';
 import 'package:ecommerce_app/providers/auth/login_provider.dart';
 import 'package:ecommerce_app/providers/auth/profile_provider.dart';
 import 'package:ecommerce_app/providers/auth/signup_provider.dart';
-import 'package:ecommerce_app/providers/location/location_provider.dart';
 import 'package:ecommerce_app/views/splash/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ForgotPasswordProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => LocationProvider()),
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
       ],
       child: MaterialApp(
         title: 'E commerce App',
